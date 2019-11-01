@@ -1,0 +1,6 @@
+[dbMysql]
+host = 101.37.124.133
+port = 3306
+user = root
+password = Adong@123.
+db_name = douban
