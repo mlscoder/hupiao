@@ -110,9 +110,7 @@ class MyspiderDownloaderMiddleware(object):
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
 
-
 proxyServer = "http://127.0.0.1:8778"
-
 
 class myProxy(object):
     def process_request(self, request, spider):
@@ -123,29 +121,3 @@ class myProxy(object):
         if response.status != 200:
             return request
         return response
-
-
-'''
-    def process_response(self, request, response, spider):
-        if response.status == 403 or response.status == 302:
-            time.sleep(60 * 2)
-            proxyList.clear()
-            proxyList.append(getoneip())
-            proxyServer = get_proxy()
-            request.meta["proxy"] = proxyServer
-            request.headers["User-Agent"] = my_fake_useragent.UserAgent().random()
-            return request
-        else:
-            return response
-
-    def process_exception(self, request, exception, spider):
-        # ip代理超时处理
-        if isinstance(exception, TimeoutError):
-            proxyList.clear()
-            proxyList.append(getoneip())
-            proxyServer = get_proxy()
-            request.meta["proxy"] = proxyServer
-            request.headers["User-Agent"] = my_fake_useragent.UserAgent().random()
-            return request
-
-'''

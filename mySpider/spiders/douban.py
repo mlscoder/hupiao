@@ -57,6 +57,11 @@ class DoubanSpider(scrapy.Spider):
         if result != None:
             script = json.loads(result.get_text(), strict=False)
             content = selector.xpath('//*[@id="content"]/div/div[1]/div[1]/div[2]/h3/span[1]/a/@href')  #
+            images = soup.find_all('img', src=re.compile(r"/view/group_topic/l/public.*"))
+            image_urls = []
+            for image in images:
+                image_url = image['src']
+                image_urls.append(image_url)
             d1 = datetime.now()
             d2 = datetime.fromisoformat((script["dateCreated"]))
             item['creator'] = str(content[0])[30:-1]  # 截取出信息创建者的豆瓣id
@@ -65,6 +70,7 @@ class DoubanSpider(scrapy.Spider):
             item['text'] = script["text"]
             item['crawDate'] = datetime.now()
             item['url'] = script["url"]
+            item['image_urls'] = image_urls
             # 只获取最近30天发布的帖子
             if ((d1 - d2).days < 30):
                 yield item

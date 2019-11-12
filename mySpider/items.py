@@ -27,3 +27,5 @@ class MyspiderItem(scrapy.Item):
     url = scrapy.Field()
     # 信息创建者
     creator = scrapy.Field()
+    # 图片
+    image_urls = scrapy.Field()
