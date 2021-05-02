@@ -24,4 +24,3 @@
 --static 静态文件
 --templates 模板文件
 --app.py flas框架核心文件
-
