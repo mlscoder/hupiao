@@ -8,6 +8,7 @@
 3. 新增帖子预测，预测帖子是否是中介帖子
 
 ## 文件说明
+- db 数据库DDL文件
 - myScrapy 爬虫功能
  * classify 分类器
     * feature_spAce 特征向量
