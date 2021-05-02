@@ -37,4 +37,4 @@
 ### Flask web部分
 
 5. 修改/myWeb/app.py中app.config['SQLALCHEMY_DATABASE_URI']的值，改成实际的数据库地址和用户名和密码
-6. 启动app.py,默认访问地址是 http://127.0.0.1:5000 Flask查询服务启动
+6. 启动app.py,Flask查询服务启动,默认访问地址是 http://127.0.0.1:5000 
