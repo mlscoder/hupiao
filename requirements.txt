@@ -87,7 +87,7 @@ threadpoolctl==2.1.0
 tqdm==4.60.0
 Twisted==21.2.0
 twisted-iocpsupport==1.0.1
-urllib3==1.26.3
+urllib3==1.26.4
 w3lib==1.22.0
 webencodings==0.5.1
 wordcloud==1.8.1
