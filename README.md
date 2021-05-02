@@ -11,14 +11,14 @@
 - myScrapy 爬虫功能
  * classify 分类器
     * feature_spAce 特征向量
-	   * models 模型
-	   * text 原始语料库
-	   * text2 分组后语料库
-   	* baidu_stopwords.txt 停用词
+    * models 模型
+    * text 原始语料库
+    * text2 分组后语料库
+    * baidu_stopwords.txt 停用词
  * myScrapy Scrapy核心文件
     * mysql 数据库工具包
-	   * rent 信息分类工具
-	   * spiders 豆瓣爬虫
+    * rent 信息分类工具
+    * spiders 豆瓣爬虫
  * utils 公共工具包
 - myweb web功能
  * static 静态文件
