@@ -1,6 +1,0 @@
-[dbMysql]
-host = 你这写你的数据库地址
-port = 3306
-user = 账户名
-password = 密码
-db_name = 数据库名字
