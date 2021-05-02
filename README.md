@@ -8,7 +8,7 @@
 3. 新增帖子预测，预测帖子是否是中介帖子
 
 ##文件说明
- -myScrapy 爬虫功能
+ - myScrapy 爬虫功能
  -- classify 分类器
  --- feature_space 特征向量
  --- models 模型
