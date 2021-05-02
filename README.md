@@ -27,12 +27,14 @@
  * app.py flas框架核心文件
 
 ## 使用步骤
+### Scrapy 爬虫部分
 1. 首先需要自己搭建数据库（MySQL7以上），然后在数据库中运行db文件夹中的建表语句
 2. （可选）修改myScrapy/myScrapy/middlewares.py中的代理ip，源文件中使用的是[阿布云](https://www.abuyun.com/ "阿布云")付费 ，如果不使用代理，则需要设置运行速度，有可能被封ip
 3. 修改myScrapy/myScrapy/mysql/MySqlUtils.py 数据库配置，根据实际情况修改
 4. 启动myScrapy/myScrapy/main.py 运行Scrapy，现在爬虫开始工作
 
 ------------
+### Flask web部分
 
 5. 修改/myWeb/app.py中app.config['SQLALCHEMY_DATABASE_URI']的值，改成实际的数据库地址和用户名和密码
 6. 启动app.py,默认访问地址是 http://127.0.0.1:5000 Flask查询服务启动
