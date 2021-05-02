@@ -4,10 +4,10 @@ import pymysql
 
 # 数据库配置字典
 mysql_config = {
-    "host": "101.37.124.133",
+    "host": "172.16.32.4",
     "port": 3306,
     "userName": "root",
-    "password": "mlsocder",
+    "password": "adong123.",
     "dbName": "douban",
     "charsets": "utf8mb4"
 }
