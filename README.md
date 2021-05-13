@@ -31,7 +31,12 @@
 1. 首先需要自己搭建数据库（MySQL7以上），然后在数据库中运行db文件夹中的建表语句
 2. （可选）修改myScrapy/myScrapy/middlewares.py中的代理ip，源文件中使用的是[阿布云](https://www.abuyun.com/ "阿布云")付费 ，如果不使用代理，则需要设置运行速度，有可能被封ip
 3. 修改myScrapy/myScrapy/mysql/MySqlUtils.py 数据库配置，根据实际情况修改
-4. 启动myScrapy/myScrapy/main.py 运行Scrapy，现在爬虫开始工作
+4. 修改myScrapy/classify/assess.py:
+  def get_classifier():
+    model_dir = 'E:\\PycharmProjects\\mlscoder\\myScrapy\\classify\\models'  # 模型存放目录 
+    data_dir = 'E:\\PycharmProjects\\mlscoder\\myScrapy\\classify\\feature_space'  # 特征数据存放目录
+    改成你自己机器的目录，主要是修改：
+5. 启动myScrapy/myScrapy/main.py 运行Scrapy，现在爬虫开始工作
 
 ------------
 ### Flask web部分
