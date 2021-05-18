@@ -16,13 +16,15 @@ dbUtil = MySqlUtil()
 class MyscrapyPipeline:
     def process_item(self, item, spider):
         result = [item["title"], item["createDate"], item["text"], item["crawDate"], item["url"], item["creator"]]
-        haveOne = [item["title"], item["creator"]]
+        haveOne = [item["creator"]]
+        image_urls = item["image_urls"]
 
-        # 查询同一个创建者发布的同一标题的帖子，方便去重。
-        querySql = "select count(*) from house_info  where title =(%s) and  creator=(%s)"
-        size = dbUtil.get_one(querySql, haveOne)
+        # 查询同一个创建者最近一个月发布的帖子
+        querySql = "select title from house_info where creator=(%s)  and crawDate >= (sysdate-30)"
+        houses = dbUtil.get_all(querySql, haveOne)
         # 如果存在相同的帖子则不保存
-        if size[0] == 0:
+
+        if haveOne(houses,item["title"]):
             saveSql = "insert into house_info (title, createDate, text,crawDate,url,creator) values (%s,%s,%s,%s,%s,%s)"
             h_id = dbUtil.save(saveSql, result)
             # 分析租房信息的分类
@@ -31,5 +33,19 @@ class MyscrapyPipeline:
             info.append(h_id)
             infoSaveSql = "insert into rent_info (url, station, `identity`,price,pay,only_girl,rent_type,`count`,create_date,h_id) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
             # 保存信息分类
-            dbUtil.save(infoSaveSql, info)
+            r_id = dbUtil.save(infoSaveSql, info)
+            # 图片链接保存
+            if len(image_urls) > 0:
+                imageSql = "INSERT INTO image(r_id,url) VALUES (%s,%s)"
+                for image_url in image_urls:
+                    i = [r_id, image_url]
+                    dbUtil.save(imageSql, i)
+
+
         return item
+
+    def haveOne(self, houses, title):
+        for house in houses:
+            if rentClassify.tfidf_similarity(house[0], title) > 0.65:
+                return False
+        return True

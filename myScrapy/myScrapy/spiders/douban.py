@@ -39,6 +39,13 @@ class DoubanSpider(scrapy.Spider):
         """
         soup = BeautifulSoup(response.text, 'html.parser')
         result = soup.find('script', {'type': 'application/ld+json'})
+
+        images = soup.find_all('img', src=re.compile(r"/view/group_topic/l/public.*"))
+        image_urls = []
+        for image in images:
+            image_url = image['src']
+            image_urls.append(image_url)
+
         # 创建一个爬虫数据对象
         item = MyscrapyItem()
         if result is not None:
@@ -52,4 +59,5 @@ class DoubanSpider(scrapy.Spider):
             item['text'] = script["text"]
             item['crawDate'] = datetime.now()
             item['url'] = script["url"]
+            item['image_urls'] = image_urls
             yield item

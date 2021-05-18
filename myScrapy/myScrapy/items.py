@@ -4,6 +4,8 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+
+
 class MyscrapyItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
@@ -19,3 +21,5 @@ class MyscrapyItem(scrapy.Item):
     url = scrapy.Field()
     # 信息创建者
     creator = scrapy.Field()
+    # 图片
+    image_urls = scrapy.Field()
