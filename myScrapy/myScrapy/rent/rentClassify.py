@@ -1,10 +1,15 @@
 # -- coding: utf-8 --
 import re
 
+from pandas import np
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 from classify import assess
 from myScrapy.mysql.MySqlUtils import MySqlUtil
-
+from scipy.linalg import norm
 import datetime
+
+dbUtil = MySqlUtil()
 
 
 def get_station(text):
@@ -90,11 +95,6 @@ def get_price(text):
         return price
 
 
-model_dir = 'E:\\PycharmProjects\\mlscoder\\myScrapy\\classify\\models'  # 模型存放目录
-data_dir = 'E:\\PycharmProjects\\mlscoder\\myScrapy\\classify\\feature_space'  # 特征数据存放目录
-classifier = assess.Logistic(data_dir, model_dir)
-
-
 def get_rent_type(text):
     """
     分类器分析文本的出租类型
@@ -102,6 +102,20 @@ def get_rent_type(text):
     :return:
     """
     return classifier.predict(text)[0]
+
+
+def get_creator_count(creator):
+    """
+    查询30天内creator发表的帖子数
+    :param creator: 创建者id
+    :return: 发表贴子数
+    """
+    today = datetime.date.today()
+    # 30天前的时间
+    date = today + datetime.timedelta(days=-30)
+    sql = "select  count(*) from house_info where creator=(%s) and  crawDate>=(%s)"
+    count = dbUtil.get_one(sql, [creator, date])
+    return count[0]
 
 
 def get_creator_count(creator):
@@ -138,11 +152,52 @@ def analysis(url, creator, text):
     return info
 
 
+model_dir = '/root/hupiao/myScrapy/classify/models'  # 模型存放目录
+data_dir = '/root/hupiao/myScrapy/classify/feature_space'  # 特征数据存放目录
+classifier = assess.Logistic(data_dir, model_dir)
+
+
+def getHouseInfo():
+    for i in range(69):
+        start = 1000 * i
+        sql = "select * from  house_info_temp limit " + str(start) + ",1000"
+        infos = dbUtil.get_all(sql)
+        infoSaveSql = "insert into rent_info_temp (url, station, `identity`,price,pay,only_girl,rent_type,create_date) values (%s,%s,%s,%s,%s,%s,%s,%s)"
+        # 保存信息分类
+        for info in infos:
+            res = analysis(info[5], info[6], info[1] + info[3])
+            dbUtil.save(infoSaveSql, res)
+            print(res)
+
+
+def check(houses, title):
+    if houses is None:
+        return True
+    else:
+        for house in houses:
+            if tfidf_similarity(house[0], title) > 0.65:
+                return False
+        return True
+
+
+def tfidf_similarity(s1, s2):
+    def add_space(s):
+        return ' '.join(list(s))
+
+    # 将字中间加入空格
+    s1, s2 = add_space(s1), add_space(s2)
+    # 转化为TF矩阵
+    cv = TfidfVectorizer(tokenizer=lambda s: s.split())
+    corpus = [s1, s2]
+    vectors = cv.fit_transform(corpus).toarray()
+    # 计算TF系数
+    return np.dot(vectors[0], vectors[1]) / (norm(vectors[0]) * norm(vectors[1]))
+
+
 if __name__ == '__main__':
-    url = "testurl"
-    creator = "textuser"
-    text1 = "标题：🌲6号线，金桥路地铁站，精装燃气一室户3300，16分钟直达世纪大道，可转乘2/4/9号线，交通方便，小区门口紧邻金桥国际，久金广场等"
-    text2 = "👠【地铁一号线】💋【无中介费】近中庚环创中心，1号线地铁站，东苑商务楼；女生合租、主卧➕独卫➕公用厨房；押一付一，给你舒适的居住体验哟！"
-    # 分析文本
-    print(analysis(url, creator, text1))
-    print(analysis(url, creator, text2))
+    # url = "testurl"
+    # creator = "textuser"
+    # text1 = "标题：🌲6号线，金桥路地铁站，精装燃气一室户3300，16分钟直达世纪大道，可转乘2/4/9号线，交通方便，小区门口紧邻金桥国际，久金广场等"
+    # text2 = "👠【地铁一号线】💋【无中介费】近中庚环创中心，1号线地铁站，东苑商务楼；女生合租、主卧➕独卫➕公用厨房；押一付一，给你舒适的居住体验哟！"
+    # 分析文本  id   title  createDate  text  crawDate  url  creator
+    getHouseInfo()

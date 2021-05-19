@@ -10,6 +10,7 @@ from scrapy import signals
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
+from scrapy.utils.response import response_status_message
 
 
 class MyscrapySpiderMiddleware:
@@ -58,7 +59,9 @@ class MyscrapySpiderMiddleware:
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
 
+
 import base64
+
 # 代理服务器
 proxyServer = "http://http-dyn.abuyun.com:9020"
 # 代理隧道验证信息
@@ -80,12 +83,17 @@ class MyscrapyDownloaderMiddleware:
         return s
 
     def process_response(self, request, response, spider):
-        # Called with the response returned from the downloader.
-
-        # Must either;
-        # - return a Response object
-        # - return a Request object
-        # - or raise IgnoreRequest
+        if request.meta.get('dont_retry', False):
+            return response
+        elif response.status == 429:
+            self.crawler.engine.pause()
+            time.sleep(6)  # If the rate limit is renewed in a minute, put 60 seconds, and so on.
+            self.crawler.engine.unpause()
+            reason = response_status_message(response.status)
+            return self._retry(request, reason, spider) or response
+        elif response.status in self.retry_http_codes:
+            reason = response_status_message(response.status)
+            return self._retry(request, reason, spider) or response
         return response
 
     def process_exception(self, request, exception, spider):
@@ -100,6 +108,7 @@ class MyscrapyDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
 
 class myProxy(object):
     def __init__(self, crawler):

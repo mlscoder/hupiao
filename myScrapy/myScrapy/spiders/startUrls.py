@@ -15,4 +15,4 @@ start_urls = ['https://www.douban.com/group/383972/',
               'https://www.douban.com/group/583132/',
               'https://www.douban.com/group/343066/']
 
-start_urls_test = ['https://www.douban.com/group/383972/']
+start_urls_test = ['https://www.douban.com/group/zufangsh/']
