@@ -37,8 +37,7 @@ def check_dir_exist(dir):
     if not os.path.exists(dir):
         os.mkdir(dir)
 
-
-def stopWords(stopword_path="baidu_stopwords.txt"):
+def stopWords(stopword_path="../../classify/baidu_stopwords.txt"):
     # 返回停用词列表，默认使用百度停用词表
     stopWords = [wd.strip() for wd in readfile(stopword_path).splitlines()]
     return stopWords
