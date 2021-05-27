@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship
 app = Flask(__name__)
 
 app.config[
-    'SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:adong123.@gz-cynosdbmysql-grp-q8hdhflp.sql.tencentcdb.com:29913/douban?charset=utf8mb4'
+    'SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:adong123.@172.16.32.4:3306/douban?charset=utf8mb4'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 # 关联app
@@ -104,7 +104,7 @@ def getSubwayStation():
     search = []
     search.append(Subway.city_code == city)
     search.append(Subway.subway_line_name == line_name)
-    subways = Subway.query.filter(*search).order_by(Subway.sort_index.asc())
+    subways = Subway.query.filter(*search)
     stationList = []
     for subway in subways:
         stationList.append(subway.subway_name)
@@ -137,7 +137,17 @@ def query_page():
         currentPage = 1
 
     if price is not None and price != '':
-        search.append(RentInfo.price <= price.strip())
+        if price == '1':
+            search.append(RentInfo.price <= '1500')
+        if price == '2':
+            search.append(RentInfo.price >= '1500')
+            search.append(RentInfo.price <= '2500')
+        if price == '3':
+            search.append(RentInfo.price >= '2500')
+            search.append(RentInfo.price <= '3500')
+        if price == '4':
+            search.append(RentInfo.price >= '3500')
+            
     if station is not None and station != ''and station != '地铁站点':
         search.append(RentInfo.station == station.strip())
     if only_girl is not None and only_girl != '不限':
@@ -190,6 +200,7 @@ def get_days_before_today(n=0):
         n_days_before = now - datetime.timedelta(days=n)
     return datetime.datetime(n_days_before.year, n_days_before.month, n_days_before.day, n_days_before.hour,
                              n_days_before.minute, n_days_before.second)
+
 
 
 if __name__ == "__main__":

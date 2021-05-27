@@ -27,12 +27,11 @@
 
     .w70 {
         display: inline-block;
-        width: 70%;
     }
 
     .item {
         float: left;
-        width: 30%;
+        margin-left:20px;
         margin-bottom: 20px;
     }
 </style>
@@ -49,6 +48,20 @@
         </span></h3>
     <div class="controls clearfix">
         <form method="post" id="myForm">
+            <div class="item">
+                地铁站点：
+                <select class="form-control-select" id="line" name="line" onchange="selectCity(this)">
+                    <option>线路</option>
+                    {% for line in lines %}
+                    <option {%if lineName== line %}
+                            selected="selected" {% endif %}> {{ line }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <select class="form-control-select" id="station" name="station">
+                    <option>站点</option>
+                </select>
+            </div>
             <div class="item">
                 出租类别：
                 <div class="w70">
@@ -91,33 +104,31 @@
                     </select>
                 </div>
             </div>
-            <div class="item">
-                地铁站点：
-                <select class="form-control-select" id="line" name="line" onchange="selectCity(this)">
-                    <option>地铁线路</option>
-                    {% for line in lines %}
-                    <option {%if lineName== line %}
-                            selected="selected" {% endif %}> {{ line }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <select class="form-control-select" id="station" name="station">
-                    <option>地铁站点</option>
-                </select>
 
-
-            </div>
             <div class="item">
                 价格上限：
                 <div class="w70">
-                    <input type="text" class="form-control" placeholder="默认不设置价格上限" name="price" {%if price!=None %}
-                           value="{{price}}" {% endif %}>
+                    <select class="form-control" name="price">
+                        <option>不限
+                        </option>
+                        <option value="1" {%if price=='1' %}
+                                selected="selected" {% endif %}>1500以下
+                        </option>
+                           <option value="2" {%if price=='2' %}
+                                selected="selected" {% endif %}>1500-2500
+                        </option>
+                           <option value="3" {%if price=='3' %}
+                                selected="selected" {% endif %}>2500-3500
+                        </option>
+                           <option value="4" {%if price=='4' %}
+                                selected="selected" {% endif %}>3500以上
+                        </option>
+                    </select>
                 </div>
             </div>
             <div>
                 <input type="hidden" id="currentPage" name="currentPage" value="{{currentPage}}"/>
-
-                <button type="submit" id="submit" class="btn btn-primary">查询</button>
+                <button type="submit" id="submit" class="item btn btn-primary">查询</button>
             </div>
         </form>
     </div>
