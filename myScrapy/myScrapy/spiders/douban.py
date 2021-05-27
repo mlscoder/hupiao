@@ -8,6 +8,8 @@ from myScrapy.items import MyscrapyItem
 from myScrapy.spiders import startUrls
 
 city = 'sh'
+
+
 class DoubanSpider(scrapy.Spider):
     name = 'douban_' + city
     allowed_domains = ['douban.com']
@@ -23,16 +25,6 @@ def getLinks(response):
     # 选取所有标签tr 且class属性等于even或odd的元素
     links = soup.find_all('a', href=re.compile(r"^https://www.douban.com/group/topic/\d{6,11}/$"))
     return links
-
-
-def parse(response):
-    soup = BeautifulSoup(response.text, 'html.parser')
-    # 选取所有标签tr 且class属性等于even或odd的元素
-    links = soup.find_all('a', href=re.compile(r"^https://www.douban.com/group/topic/\d{6,11}/$"))
-    for link in links:
-        new_url = link['href']
-        # 请求详细页,请求完成后调用回调函数--detail
-        yield scrapy.Request(url=new_url, dont_filter=True, callback=detail, cb_kwargs={'city': 'sh'})
 
 
 def detail(response, city):
