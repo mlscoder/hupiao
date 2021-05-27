@@ -23,3 +23,5 @@ class MyscrapyItem(scrapy.Item):
     creator = scrapy.Field()
     # 图片
     image_urls = scrapy.Field()
+    # 城市
+    city = scrapy.Field()

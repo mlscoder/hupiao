@@ -11,8 +11,9 @@
     //jqPaginator插件初始化，参数配置
     $.jqPaginator('#pagination', {
         totalPages: parseInt(countindex),
-        visiblePages: parseInt(myPageSize),
+        visiblePages: 5,
         currentPage: currentPage,
+
         first: '<li class="first"><a href="javascript:;">首页</a></li>',
         prev: '<li class="prev"><a href="javascript:;"><i class="arrow arrow2"></i>上一页</a></li>',
         next: '<li class="next"><a href="javascript:;">下一页<i class="arrow arrow3"></i></a></li>',

@@ -6,11 +6,25 @@
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="/static/js/jqPaginator.min.js" type="text/javascript"></script>
+    <link rel="Shortcut Icon" href="/static/img/mlscoder.ico" type="image/x-icon"/>
 
 </head>
 
 <body>
+
 <style>
+    .title {
+        font-size: 25px;
+        padding: 10px;
+        margin-bottom: 30px;
+    }
+
+    .city {
+        font-size: 20px;
+        padding: 10px;
+        margin-bottom: 30px;
+    }
+
     .w70 {
         display: inline-block;
         width: 70%;
@@ -23,7 +37,16 @@
     }
 </style>
 <div class="container">
-    <h1><strong>马拉松程序员项目演示(上海租房信息分类)</strong></h1>
+    <input type="hidden" id="cityCode" value="{{cityCode}}">
+    <input type="hidden" id="lineName" value="{{lineName}}">
+
+    <input type="hidden" id="stationName" value="{{station}}">
+
+    <h3 class="title"><strong>多城市租房信息分类演示</strong>
+        <span class="city">&nbsp; &nbsp; 当前<span style="color: red">{{cityName}}</span> &nbsp;&nbsp;切换
+      <a href="/?city=sh">上海</a>  |<a href="/?city=bj">北京</a>|<a href="/?city=gz">广州</a>|<a href="/?city=sz">深圳</a>|<a
+                    href="/?city=hz">杭州</a>| <a href="/?city=nj">南京</a>|<a href="/?city=cq">重庆</a>|<a href="/?city=cd">成都</a>
+        </span></h3>
     <div class="controls clearfix">
         <form method="post" id="myForm">
             <div class="item">
@@ -70,10 +93,19 @@
             </div>
             <div class="item">
                 地铁站点：
-                <div class="w70">
-                    <input type="text" class="form-control" placeholder="地铁站名，如：莘庄" name="station" {%if station!=None %}
-                           value="{{station}}" {% endif %}>
-                </div>
+                <select class="form-control-select" id="line" name="line" onchange="selectCity(this)">
+                    <option>地铁线路</option>
+                    {% for line in lines %}
+                    <option {%if lineName== line %}
+                            selected="selected" {% endif %}> {{ line }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <select class="form-control-select" id="station" name="station">
+                    <option>地铁站点</option>
+                </select>
+
+
             </div>
             <div class="item">
                 价格上限：
@@ -82,14 +114,6 @@
                            value="{{price}}" {% endif %}>
                 </div>
             </div>
-            <div class="item">
-                发布次数：
-                <div class="w70">
-                    <input type="text" class="form-control" placeholder="默认不设置" name="count" {%if count!=None %}
-                           value="{{count}}" {% endif %}>
-                </div>
-            </div>
-
             <div>
                 <input type="hidden" id="currentPage" name="currentPage" value="{{currentPage}}"/>
 
@@ -106,8 +130,7 @@
             <th>付款类型</th>
             <th>限女生</th>
             <th>价格</th>
-            <th>发布次数</th>
-            <th>帖子预测</th>
+            <th title="创建者一个月内发布帖子的次数，如果次数超过5次，可能是职业房东和中介账号，供参考判断">账号发布次数❗</th>
             <th>创建时间</th>
             <th width="400px">标题</th>
             <th>详情</th>
@@ -127,30 +150,29 @@
                     {% endif %}
                 </td>
                 <td>{% if rent.pay=='1' %}
-                    押一付一</span>
+                    <span style="color: blue"> 押一付一</span>
                     {% elif rent.pay=='3' %}
                     押一付三
                     {% endif %}
                 </td>
                 <td>
                     {% if rent.only_girl=='1' %}
-                    是
+                    <span style="color: red">   是</span>
                     {% else %}
                     &nbsp;
                     {% endif %}
                 </td>
                 <td>{{ rent.price or '' }}</td>
-                <td> {% if rent.count==0 %}
-                    首次
-                    {% else %}
-                    {{ rent.count +1}}
+                <td>
+                    {{ rent.monthSum}}
+
+                    {% if rent.identity==1 %}
+                    <span style="color: red"> &nbsp;&nbsp;疑似中介</span>
                     {% endif %}
+
                 </td>
-                <td>{% if rent.identity==1 %}
-                    疑似广告
-                    {% endif %}
-                </td>
-                <td>{{ rent.create_date.strftime("%Y-%m-%d %H:%M") }}</td>
+
+                <td>{{ rent.create_date.strftime("%Y-%m-%d %H:%M:%S") }}</td>
                 <td>{{ rent.houseInfo.title }}</td>
                 <td><a href="{{ rent.url }}" target="_blank">查看</a></td>
             </tr>
@@ -173,5 +195,66 @@
 
 </div>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        var lineName = $("#lineName").val();
+        var stationName = $("#stationName").val();
+        var cityCode = $("#cityCode").val();
+        $.ajax({
+            type: "GET",
+            url: "getSubwayStation?city=" + cityCode + "&line=" + lineName,
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var citys = data;
+                var oCitySele = document.getElementById("station");
+                var opts = oCitySele.getElementsByTagName("option");
+                var len = opts.length;//4 3
+                for (var i = 1; i < len; i++) {
+                    oCitySele.removeChild(opts[1]);
+                }
+                for (var i = 0; i < citys.length; i++) {
+                    var opt = document.createElement("option");
+                    opt.innerHTML = citys[i];
+                    if (stationName == citys[i]) {
+                        opt.selected = true;
+                    }
+                    oCitySele.appendChild(opt);
+                }
+            }
+        });
+
+    });
+</script>
+<script type="text/javascript">
+    function selectCity(thisobj) {
+        var prov = thisobj.value;
+        var stationName = $("#stationName").val();
+        var cityCode = $("#cityCode").val();
+        $.ajax({
+            type: "GET",
+            url: "getSubwayStation?city=" + cityCode + "&line=" + prov,
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+                var citys = data;
+                var oCitySele = document.getElementById("station");
+                var opts = oCitySele.getElementsByTagName("option");
+                var len = opts.length;//4 3
+                for (var i = 1; i < len; i++) {
+                    oCitySele.removeChild(opts[1]);
+                }
+                for (var i = 0; i < citys.length; i++) {
+                    var opt = document.createElement("option");
+                    opt.innerHTML = citys[i];
+                    if (stationName == citys[i]) {
+                        opt.selected = true;
+                    }
+                    oCitySele.appendChild(opt);
+                }
+            }
+        });
+    }
+</script>
 </body>
 </html>

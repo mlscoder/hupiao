@@ -12,16 +12,16 @@ import datetime
 dbUtil = MySqlUtil()
 
 
-def get_station(text):
+def get_station(city, text):
     '''
-    寻找文本中第一个出现的地铁站点名称,并且根据文本中出现的地铁站数量，预测创建者身份
-    :param text:文本
-    :return: 地铁站点,(1/0) 1:表示预测为广告贴，0不确定
+    :param city: 城市
+    :param text:  文本
+    :return:  地铁站点,(1/0) 1:表示预测为广告贴，0不确定
     '''
     from myScrapy.rent import stations
     metro = dict()
     # 遍历地铁list，找到文本中地铁站点
-    for station in stations.stations:
+    for station in stations.getCityStations(city):
         if text.find(station) >= 0 and station not in metro:
             metro[station] = text.find(station)
     if len(metro) == 0:  # 如果没有出现过地铁站，返回空
@@ -33,7 +33,7 @@ def get_station(text):
         return metro_order[0][0], 0
     for k, v in metro_order:
         # 删除商圈的地铁站点
-        if k in stations.business_station:
+        if k in stations.getCityStations(city + "_b"):
             metro.pop(k)
     if len(metro) > 3:
         # 同一个帖子中地铁站点大于三个，则帖子会认为广告贴。
@@ -133,7 +133,7 @@ def get_creator_count(creator):
     return count[0]
 
 
-def analysis(url, creator, text):
+def analysis(url, creator, city, text):
     """
     分析文本中的各个信息
     :param url:  帖子链接
@@ -142,7 +142,7 @@ def analysis(url, creator, text):
     :return: 返回分类结果信息的列表
     """
 
-    station, identity = get_station(text)
+    station, identity = get_station(city, text)
     pay = get_pay(text)
     price = get_price(text)
     only_girl = get_only_girl(text)
@@ -176,8 +176,8 @@ def tfidf_similarity(s1, s2):
     return np.dot(vectors[0], vectors[1]) / (norm(vectors[0]) * norm(vectors[1]))
 
 
-model_dir = '../../classify/models'  # 模型存放目录
-data_dir = '../../classify/feature_space'  # 特征数据存放目录
+model_dir = '/root/hupiao/myScrapy/classify/models'  # 模型存放目录
+data_dir = '/root/hupiao/myScrapy/classify/feature_space'  # 特征数据存放目录
 classifier = assess.Logistic(data_dir, model_dir)
 
 if __name__ == '__main__':

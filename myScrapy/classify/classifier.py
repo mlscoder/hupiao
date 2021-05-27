@@ -67,15 +67,10 @@ class TextClassifier:
         print('f1-score: {0:.3f}'.format(metrics.f1_score(actual, predicted, average='weighted')))
 
     def predict(self, text_string=None):
-        '''
-        使用模型新文本类型
-        :param text_string: 新闻文本
-        :return: 预测的类别
-        '''
         vocabulary = tools.readObject(self.vocabulary_data)
         if text_string:
             corpus = [' '.join(jieba.cut(text_string))]
-            vectorizer = TfidfVectorizer(vocabulary=vocabulary, stop_words=tools.stopWords('E:\\PycharmProjects\\mlscoder\\myScrapy\\classify\\baidu_stopwords.txt'))
+            vectorizer = TfidfVectorizer(vocabulary=vocabulary, stop_words=tools.stopWords())
             tdm = vectorizer.fit_transform(corpus)
             return self._predict(tdm)
         else:

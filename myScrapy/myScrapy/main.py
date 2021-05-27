@@ -8,5 +8,5 @@ while True:
     # 7点之前，大约40跑一次
 
     # if i < 7:
-    #   time.sleep(60)
-    os.system("scrapy crawl douban")
+    #   time.sleep(60)crsapy c
+    os.system(" scrapy crawlall")
