@@ -1,6 +1,6 @@
 # hupiao
 # 马拉松程序员项目演示（上海租房信息分类）
-## 多城市租房分类演示（沪漂小窝v4.0） 演示地址：https://hupiao.mlscoder.cn/ 
+## 多城市租房信息分类演示（沪漂小窝v4.0） 演示地址：https://hupiao.mlscoder.cn/ 
 ### master分支是沪漂小窝v3.0,单城市版本
 ### manycities 分支是沪漂小窝v4.0,多城市版本。
     目前支持的城市：上海、北京、广州、深圳、杭州、南京、武汉、重庆、成都。
@@ -31,7 +31,7 @@
  * myScrapy Scrapy核心文件
     * mysql 数据库工具包
     * rent 信息分类工具
-    * spiders 豆瓣爬虫
+    * spiders 豆瓣爬虫 (包含9个城市的爬虫)
  * utils 公共工具包
 - myweb web功能
  * static 静态文件
