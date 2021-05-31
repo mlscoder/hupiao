@@ -5,9 +5,11 @@ from datetime import datetime
 import scrapy
 from bs4 import BeautifulSoup
 from myScrapy.items import MyscrapyItem
+from myScrapy.mysql.MySqlUtils import MySqlUtil
 from myScrapy.spiders import startUrls
 
 city = 'sh'
+dbUtil = MySqlUtil()
 
 
 class DoubanSpider(scrapy.Spider):
@@ -17,14 +19,20 @@ class DoubanSpider(scrapy.Spider):
 
     def parse(self, response):
         for link in getLinks(response):
-            yield scrapy.Request(url=link['href'], dont_filter=True, callback=detail, cb_kwargs={'city': city})
+            yield scrapy.Request(url=link, dont_filter=True, callback=detail, cb_kwargs={'city': city})
 
 
 def getLinks(response):
     soup = BeautifulSoup(response.text, 'html.parser')
     # 选取所有标签tr 且class属性等于even或odd的元素
     links = soup.find_all('a', href=re.compile(r"^https://www.douban.com/group/topic/\d{6,11}/$"))
-    return links
+    linkList = []
+    queryHave = "select count(*) from house_info where url=(%s) "
+    for link in links:
+        houses = dbUtil.get_one(queryHave, link['href'])
+        if houses[0] == 0:
+            linkList.append(link['href'])
+    return linkList
 
 
 def detail(response, city):

@@ -13,4 +13,4 @@ class DoubanSpider(scrapy.Spider):
 
     def parse(self, response):
         for link in douban.getLinks(response):
-            yield scrapy.Request(url=link['href'], dont_filter=True, callback=douban.detail, cb_kwargs={'city': city})
+            yield scrapy.Request(url=link, dont_filter=True, callback=douban.detail, cb_kwargs={'city': city})
