@@ -2951,7 +2951,7 @@ output {
     display: block;
     width: 100%;
     height: 34px;
-    padding: 6px 12px;
+    padding: 6px 6px;
     font-size: 14px;
     line-height: 1.42857143;
     color: #555;
@@ -2970,9 +2970,8 @@ output {
 }
 
 .form-control-select {
-
-    width: 33%;
     height: 34px;
+   
     font-size: 14px;
     line-height: 1.42857143;
     color: #555;

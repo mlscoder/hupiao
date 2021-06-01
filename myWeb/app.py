@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship
 app = Flask(__name__)
 
 app.config[
-    'SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:adong123.@172.16.32.4:3306/douban?charset=utf8mb4'
+    'SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:adong123.@gz-cynosdbmysql-grp-q8hdhflp.sql.tencentcdb.com:29913/douban?charset=utf8mb4'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 # 关联app
@@ -39,8 +39,8 @@ class Subway(db.Model):
     subway_line_name = db.Column(db.String)
     subway_name = db.Column(db.String)
     sort_index = db.Column(db.String)
-    city_code = db.Column(db.Date)
-    sort_line = db.Column(db.Date)
+    city_code = db.Column(db.String)
+    sort_line = db.Column(db.String)
 
 
 class HouseInfo(db.Model):
@@ -55,6 +55,20 @@ class HouseInfo(db.Model):
     creator = db.Column(db.String)
     createDate = db.Column(db.Date)
     crawDate = db.Column(db.Date)
+
+
+class Agent(db.Model):
+    __tablename__ = 'agent'
+    houseInfo = relationship("HouseInfo")
+    a_id = db.Column(db.Integer, primary_key=True)
+    h_id = db.Column(db.Integer, ForeignKey('house_info.id'))
+    nick_name = db.Column(db.String)
+    creator = db.Column(db.String)
+    city = db.Column(db.String)
+    month_num = db.Column(db.String)
+    last_month_num = db.Column(db.String)
+    create_date = db.Column(db.String)
+    title = db.Column(db.String)
 
 
 class RentInfo(db.Model):
@@ -129,6 +143,7 @@ def query_page():
     rent_type = request.form.get('rent_type')
     count = request.form.get('count')
     lineName = request.form.get('line')
+    agent = request.form.get('agent')
 
     search = []
     search.append(RentInfo.city == city)
@@ -147,8 +162,8 @@ def query_page():
             search.append(RentInfo.price <= '3500')
         if price == '4':
             search.append(RentInfo.price >= '3500')
-            
-    if station is not None and station != ''and station != '地铁站点':
+
+    if station is not None and station != '' and station != '站点':
         search.append(RentInfo.station == station.strip())
     if only_girl is not None and only_girl != '不限':
         search.append(RentInfo.only_girl == only_girl)
@@ -156,6 +171,8 @@ def query_page():
         search.append(RentInfo.pay == pay)
     if rent_type is not None and rent_type != '不限':
         search.append(RentInfo.rent_type == rent_type)
+    if agent is not None and agent != '否':
+        search.append(RentInfo.identity == agent)
     search.append(RentInfo.create_date >= str(get_days_before_today(15)))
 
     # 查询中添加上分页
@@ -184,8 +201,46 @@ def query_page():
                            only_girl=only_girl, pay=pay,
                            rent_type=rent_type, count=count,
                            cityName=cityName.get(city),
-                           cityCode=city, lines=lineList,lineName=lineName,
+                           cityCode=city, lines=lineList, lineName=lineName, agent=agent,
                            pageSize=pageSize, currentPage=currentPage, pageCount=pageCount)
+
+
+# 查询页面
+@app.route('/agent', methods=['GET', 'POST'])
+def query_agent():
+    city = request.args.get("city")
+    if city is None:
+        city = 'sh'
+    station = request.form.get('station')
+    lineName = request.form.get('line')
+
+    if station is None or station == '站点':
+        search = []
+        search.append(Subway.city_code == city)
+        stations = Subway.query.filter(*search).order_by(Subway.subway_line_id.asc()).limit(1)
+        stations = list(stations)
+        subway = stations[0]
+        # 查询中添加上分页
+        lineName = subway.subway_line_name
+        station = subway.subway_name
+    sql = """
+           select a.station,b.week_num,b.month_num,b.quarter_num, b.create_date,c.title, c.url   
+           from station_agent a left join agent  b   on a.agent = b.creator  left join house_info c on b.h_id =c.id  
+           where a.city=:city and a.station=:station order by month_num desc """
+
+    rents = db.session.execute(sql, {'city': city, 'station': station})
+    rents = list(rents)
+
+    sql = 'select distinct subway_line_name from  subways  where city_code=:cityCode '
+    line_names = db.session.execute(sql, {'cityCode': city})
+    lines = list(line_names)
+    lineList = []
+    for line in lines:
+        lineList.append(line[0])
+    return render_template('agent.html', rents=rents,
+                           station=station,
+                           cityName=cityName.get(city),
+                           cityCode=city, lines=lineList, lineName=lineName)
 
 
 # 获取当前时间点前n天的时间
@@ -200,7 +255,6 @@ def get_days_before_today(n=0):
         n_days_before = now - datetime.timedelta(days=n)
     return datetime.datetime(n_days_before.year, n_days_before.month, n_days_before.day, n_days_before.hour,
                              n_days_before.minute, n_days_before.second)
-
 
 
 if __name__ == "__main__":
