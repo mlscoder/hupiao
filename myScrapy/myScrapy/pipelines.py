@@ -19,11 +19,12 @@ class MyscrapyPipeline:
         haveOne = [item["creator"]]
         city = item["city"]
         image_urls = item["image_urls"]
-        # 查询同一个创建者最近一个月发布的帖子
+
         querySql = "select title from house_info where creator=(%s)  and crawDate >= DATE_SUB(NOW(),INTERVAL 30 day)"
         houses = dbUtil.get_all(querySql, haveOne)
         # 储存原始信息
         saveSql = "insert into house_info (title, createDate, text,crawDate,url,creator) values (%s,%s,%s,%s,%s,%s)"
+
         h_id = dbUtil.save(saveSql, result)
         # 如果存在相似度很高的帖子，则不进行分析
         if rentClassify.check(houses, item["title"]):

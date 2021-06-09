@@ -24,7 +24,6 @@ class DoubanSpider(scrapy.Spider):
 
 def getLinks(response):
     soup = BeautifulSoup(response.text, 'html.parser')
-    # 选取所有标签tr 且class属性等于even或odd的元素
     links = soup.find_all('a', href=re.compile(r"^https://www.douban.com/group/topic/\d{6,11}/$"))
     linkList = []
     queryHave = "select count(*) from house_info where url=(%s) "
@@ -56,13 +55,27 @@ def detail(response, city):
         # json 字符串转成json对象
         script = json.loads(result.string, strict=False)
         content = soup.find('a', href=re.compile("^https://www.douban.com/people/"))
-        # 截取出信息创建者的豆瓣id
-        item['creator'] = str(content['href'])[30:-1]
-        item['title'] = script["name"]
-        item['createDate'] = script["dateCreated"]
-        item['text'] = script["text"]
-        item['crawDate'] = datetime.now()
-        item['url'] = script["url"]
-        item['image_urls'] = image_urls
-        item['city'] = city
-        yield item
+        # 排序求租的帖子
+        if exclude(script["name"]):
+            item['creator'] = str(content['href'])[30:-1]
+            item['title'] = script["name"]
+            item['createDate'] = script["dateCreated"]
+            item['text'] = script["text"]
+            item['crawDate'] = datetime.now()
+            item['url'] = script["url"]
+            item['image_urls'] = image_urls
+            item['city'] = city
+            yield item
+
+
+def exclude(text):
+    """
+    去除求租的帖子
+    :param text:
+    :return:
+    """
+    qiuzu_word = r'求租|找室友|求.{0,5}租'
+    if re.search(qiuzu_word, text) is None:
+        return True
+    else:
+        return False

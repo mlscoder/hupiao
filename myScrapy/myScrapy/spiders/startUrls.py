@@ -96,15 +96,15 @@ wuhan_urls = ['https://www.douban.com/group/566579/', 'https://www.douban.com/gr
               'https://www.douban.com/group/638947/', 'https://www.douban.com/group/352552/',
               'https://www.douban.com/group/whesf/', 'https://www.douban.com/group/374100/']
 
-cityUrlsDict= {'sh': start_urls,
-        'bj': beijing_start_urls,
-        'gz': guangzhou_urls,
-        'sz': shenzhen_urls,
-        'hz': hangzhou_urls,
-        'nj': nanjing_urls,
-        'cd': chengdu_urls,
-        'cq': chongqing_urls,
-        'wh':wuhan_urls}
+cityUrlsDict = {'sh': start_urls,
+                'bj': beijing_start_urls,
+                'gz': guangzhou_urls,
+                'sz': shenzhen_urls,
+                'hz': hangzhou_urls,
+                'nj': nanjing_urls,
+                'cd': chengdu_urls,
+                'cq': chongqing_urls,
+                'wh': wuhan_urls}
 
 
 def getStartUrls(city):

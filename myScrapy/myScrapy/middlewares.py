@@ -63,17 +63,24 @@ class MyscrapySpiderMiddleware:
 import base64
 
 # 代理服务器
-proxyServer = "http://http-dyn.abuyun.com:9020"
+# proxyServer = "http://http-dyn.abuyun.com:9020"
 # 代理隧道验证信息
-proxyUser = "H5J492Y13VHEV62D"
-proxyPass = "B8C90D2255566DFC"
-proxyAuth = "Basic " + base64.urlsafe_b64encode(bytes((proxyUser + ":" + proxyPass), "ascii")).decode("utf8")
+# proxyUser = "H5J492Y13VHEV62D"
+# proxyPass = "B8C90D2255566DFC"
+# proxyAuth = "Basic " + base64.urlsafe_b64encode(bytes((proxyUser + ":" + proxyPass), "ascii")).decode("utf8")
+
+
+# appkey为你订单的key
+proxyAuth = "Basic " + "b1BBV21LckpUM0ZjNGdBeDprQU5FSHJDY0NYSUMwbTYx"
+# 代理服务器
+proxyServer = "secondtransfer.moguproxy.com:9001"
 
 
 class MyscrapyDownloaderMiddleware:
     def process_request(self, request, spider):
         request.meta["proxy"] = proxyServer
-        request.headers["Proxy-Authorization"] = proxyAuth
+        request.headers["Authorization"] = proxyAuth
+        request.headers["User-Agent"] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0'
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -83,17 +90,12 @@ class MyscrapyDownloaderMiddleware:
         return s
 
     def process_response(self, request, response, spider):
-        if request.meta.get('dont_retry', False):
-            return response
-        elif response.status == 429:
-            self.crawler.engine.pause()
-            time.sleep(6)  # If the rate limit is renewed in a minute, put 60 seconds, and so on.
-            self.crawler.engine.unpause()
-            reason = response_status_message(response.status)
-            return self._retry(request, reason, spider) or response
-        elif response.status in self.retry_http_codes:
-            reason = response_status_message(response.status)
-            return self._retry(request, reason, spider) or response
+        # Called with the response returned from the downloader.
+
+        # Must either;
+        # - return a Response object
+        # - return a Request object
+        # - or raise IgnoreRequest
         return response
 
     def process_exception(self, request, exception, spider):
@@ -108,47 +110,3 @@ class MyscrapyDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
-
-
-class myProxy(object):
-    def __init__(self, crawler):
-        super(myProxy, self).__init__()
-        self.appkey = "103351821"
-        self.secret = "0651241404a190e6dacc4935e4305ccc"
-        self.mayi_url = 's2.proxy.mayidaili.com'
-        self.mayi_port = '8123'
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(crawler)
-
-    def get_proxy_authorization(self):
-        paramMap = {
-            "app_key": self.appkey,
-            # 如果你的程序在国外，请进行时区处理
-            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
-        }
-        # 排序
-        keys = paramMap.keys()
-        codes = "%s%s%s" % (self.secret, str().join('%s%s' %
-                                                    (key, paramMap[key]) for key in keys), self.secret)
-        # 计算签名
-        sign = hashlib.md5(codes.encode()).hexdigest().upper()
-        paramMap["sign"] = sign
-        # 拼装请求头Proxy-Authorization的值
-        keys = paramMap.keys()
-        authHeader = "MYH-AUTH-MD5 " + \
-                     str('&').join('%s=%s' % (key, paramMap[key]) for key in keys)
-        return authHeader
-
-    def get_proxy_url(self):
-        return 'http://{}:{}'.format(self.mayi_url, self.mayi_port)
-
-    def process_request(self, request, spider):
-        request.meta['proxy'] = self.get_proxy_url()
-        request.headers['Mayi-Authorization'] = self.get_proxy_authorization()
-
-    def process_response(self, request, response, spider):
-        if response.status != 200:
-            return request
-        return response
