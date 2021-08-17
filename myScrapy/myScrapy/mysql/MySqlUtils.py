@@ -2,13 +2,15 @@ import json
 
 import pymysql
 
+import config
+
 # 数据库配置字典
 mysql_config = {
-    "host": "172.16.32.4",
-    "port": 3306,
-    "userName": "root",
-    "password": "adong123.",
-    "dbName": "douban",
+    "host": config.host,
+    "port": config.port,
+    "userName": config.name,
+    "password": config.password,
+    "dbName": config.dbname,
     "charsets": "utf8mb4"
 }
 

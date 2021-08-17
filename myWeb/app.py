@@ -6,10 +6,17 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
+import config
+
 app = Flask(__name__)
 
+host = config.host
+port = config.port
+name = config.name
+password = config.password
+dbname = config.dbname
 app.config[
-    'SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:adong123.@gz-cynosdbmysql-grp-q8hdhflp.sql.tencentcdb.com:29913/douban?charset=utf8mb4'
+    'SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{name}:{password}@{host}:{port}/{dbname}?charset=utf8mb4'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 # 关联app
@@ -25,7 +32,8 @@ cityName = {
     'nj': '南京',
     'wh': '武汉',
     'cd': '成都',
-    'cq': '重庆'
+    'cq': '重庆',
+    'suz': '苏州'
 }
 
 
