@@ -71,7 +71,7 @@ import base64
 
 
 # appkey为你订单的key
-proxyAuth = "Basic " + "b1BBV21LckpUM0ZjNGdBeDprQU5FSHJDY0NYSUMwbTYx"
+proxyAuth = "Basic " + "SVRwQlNtaVdjeER3WUx4ejpwR1V4ZHdMTHVsbU5scVhG"
 # 代理服务器
 proxyServer = "secondtransfer.moguproxy.com:9001"
 

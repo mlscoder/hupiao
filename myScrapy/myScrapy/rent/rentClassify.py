@@ -1,6 +1,8 @@
 # -- coding: utf-8 --
+import json
 import re
 
+import requests
 from pandas import np
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -8,6 +10,8 @@ from classify import assess
 from myScrapy.mysql.MySqlUtils import MySqlUtil
 from scipy.linalg import norm
 import datetime
+
+from myScrapy.spiders import plot
 
 dbUtil = MySqlUtil()
 
@@ -133,6 +137,57 @@ def get_creator_count(creator):
     return count[0]
 
 
+# 参数s1为源字符串，参数s2为要查找的字符串
+# 小区
+def index_of_str(s1, s2):
+    if s2.find(s1) >= 0:
+        return s1
+    else:
+        return None
+
+
+cityName = {'sh': '上海',
+            'bj': '北京',
+            'sz': '深圳',
+            'gz': '广州',
+            'nj': '南京',
+            'hz': '杭州',
+            'wh': '武汉',
+            'cd': '成都',
+            'cq': '重庆',
+            }
+
+
+# 获取地点经纬度
+def getlatandlng(address, city):
+    print(address)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0'}
+    url = 'http://api.map.baidu.com/place/v2/suggestion?query=' + address + '&region=' + cityName.get(
+        city) + '&city_limit=true&output=json&ak=0hdwygAqu7k4W9VpCWj39ctK3TvobWSi'
+    response = requests.get(url, headers=headers)
+    jsonObject = json.loads(response.text)
+    location = jsonObject['result'][0]['location']
+    lat = location['lat']
+    lng = location['lng']
+    print(lat, lng)
+    return lat, lng
+
+
+def get_plot(city, station, text):
+    # 查找文字信息中时候含有小区名字的信息
+    address = None
+    lat = None
+    lng = None
+    for p in plot.getPlotByCity(city):
+        if index_of_str(p, text) != None:
+            address = p
+    if address is not None:
+        lat, lng = getlatandlng(address, city)
+    if station is not None:
+        lat, lng = getlatandlng(station, city)
+    return address, lat, lng
+
+
 def analysis(url, creator, city, text):
     """
     分析文本中的各个信息
@@ -148,7 +203,8 @@ def analysis(url, creator, city, text):
     only_girl = get_only_girl(text)
     rentType = get_rent_type(text)
     count = get_creator_count(creator)
-    info = [url, station, identity, price, pay, only_girl, rentType, count, datetime.datetime.now()]
+    address, lat, lng = get_plot(city, station, text)
+    info = [url, station, identity, price, pay, only_girl, rentType, count, datetime.datetime.now(), address, lat, lng]
     return info
 
 

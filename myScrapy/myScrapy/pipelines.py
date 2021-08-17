@@ -33,7 +33,7 @@ class MyscrapyPipeline:
             # 添加租房信息的id
             info.append(h_id)
             info.append(city)
-            infoSaveSql = "insert into rent_info (url, station, `identity`,price,pay,only_girl,rent_type,`count`,create_date,h_id,city) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            infoSaveSql = "insert into rent_info (url, station, `identity`,price,pay,only_girl,rent_type,`count`,create_date,address,latitude,longitude,h_id,city) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
             # 保存信息分类
             r_id = dbUtil.save(infoSaveSql, info)
             # 图片链接保存
