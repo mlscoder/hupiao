@@ -10,7 +10,24 @@
 #### v4页面
 ![image](https://user-images.githubusercontent.com/49440936/119754742-74176800-bed3-11eb-9d25-5bbb99a77c12.png)
 
+
+## 使用步骤
+0. 先安装环境，相关包参考requirements.txt,文件中可能不是最新版本的,不确定最新版的包是否存在兼容问题
+### Scrapy 爬虫部分
+1. 首先需要自己搭建数据库（MySQL7以上），然后在数据库中运行db文件夹中的建表语句
+2. （可选）修改myScrapy/myScrapy/middlewares.py中的代理ip，源文件中使用的是[阿布云](https://www.abuyun.com/ "阿布云")付费 ，如果不使用代理，则需要设置运行速度，有可能被封ip
+3. 修改myScrapy/myScrapy/mysql/MySqlUtils.py 数据库配置，根据实际情况修改
+4. 启动myScrapy/myScrapy/main.py 运行Scrapy，现在爬虫开始工作
+
+------------
+### Flask web部分
+
+5. 修改/myWeb/app.py中app.config['SQLALCHEMY_DATABASE_URI']的值，改成实际的数据库地址和用户名和密码
+6. 启动app.py,Flask查询服务启动,默认访问地址是 http://127.0.0.1:5000 
+
+
 ## 更新日志：
+* 2021/08/17 上传项目依赖包文件
 * 2021/06/09 修复并发下载内容重复的问题
 * 2021/06/01 添加搜中介功能
 * 2021/05/27 提交多版本代码,在manycities分支上，master分支需要配合案例，并没有合并
@@ -41,17 +58,4 @@
  * static 静态文件
  * emplates 模板文件
  * app.py flas框架核心文件
-
-## 使用步骤
-### Scrapy 爬虫部分
-1. 首先需要自己搭建数据库（MySQL7以上），然后在数据库中运行db文件夹中的建表语句
-2. （可选）修改myScrapy/myScrapy/middlewares.py中的代理ip，源文件中使用的是[阿布云](https://www.abuyun.com/ "阿布云")付费 ，如果不使用代理，则需要设置运行速度，有可能被封ip
-3. 修改myScrapy/myScrapy/mysql/MySqlUtils.py 数据库配置，根据实际情况修改
-4. 启动myScrapy/myScrapy/main.py 运行Scrapy，现在爬虫开始工作
-
-------------
-### Flask web部分
-
-5. 修改/myWeb/app.py中app.config['SQLALCHEMY_DATABASE_URI']的值，改成实际的数据库地址和用户名和密码
-6. 启动app.py,Flask查询服务启动,默认访问地址是 http://127.0.0.1:5000 
 
