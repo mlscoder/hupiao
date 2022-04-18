@@ -1,12 +1,9 @@
 import json
 from datetime import datetime
 import scrapy
-from myScrapy.items import MyscrapyItem
 
-# 这是数据接口的api授权用户名
-username = "adong"
-# 设置爬取的页数，全量是1641页，测试的时候可以设置3，可以快速看结果
-page_num = 5
+from config import username, page_num
+from myScrapy.items import MyscrapyItem
 
 
 class DoubanSpider(scrapy.Spider):
