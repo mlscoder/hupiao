@@ -1,63 +1,41 @@
-import scrapy
 import json
-import re
 from datetime import datetime
 import scrapy
-from bs4 import BeautifulSoup
 from myScrapy.items import MyscrapyItem
-from myScrapy.spiders import startUrls
+
+# 这是数据接口的api授权用户名
+username = "adong"
+# 设置爬取的页数，全量是1641页，测试的时候可以设置3，可以快速看结果
+page_num = 5
 
 
 class DoubanSpider(scrapy.Spider):
     name = 'douban'
-    allowed_domains = ['douban.com']
-    start_urls = startUrls.start_urls
+    allowed_domains = ['mlscoder.cn']
+    page = 1
+    start_urls = [f"https://hpapi.mlscoder.cn/data?username={username}&page=1"]
 
     def parse(self, response):
-        soup = BeautifulSoup(response.text, 'html.parser')
-        # 选取所有标签tr 且class属性等于even或odd的元素
-        links = soup.find_all('a', href=re.compile(r"/group/topic/.*"))
-        for link in links:
-            new_url = link['href']
-            # yield item  注释yield item ，因为detail方法中yield item会覆盖这个
-            # 请求详细页,请求完成后调用回调函数--detail
-            yield scrapy.Request(url=new_url, callback=self.detail)
-            '''
-            实例化对象要放在循环里面，否则会造成item被多次赋值，
-            因为每次循环完毕后，请求只给了调度器，入队，并没有去执行请求，
-            循环完毕后，下载器会异步执行队列中的请求,此时item已经为最后一条记录，
-            而详细内容根据url不同去请求的，所以每条详细页是完整的，
-            最终结果是数据内容为每页最后一条，详细内容与数据内容不一致，
-            在yield item后，会把内容写到pipeline中
-            '''
-
-    def detail(self, response):
-        """
-        爬取详细内容
-        :param response:
-        :return:
-        """
-        soup = BeautifulSoup(response.text, 'html.parser')
-        result = soup.find('script', {'type': 'application/ld+json'})
-
-        images = soup.find_all('img', src=re.compile(r"/view/group_topic/l/public.*"))
-        image_urls = []
-        for image in images:
-            image_url = image['src']
-            image_urls.append(image_url)
-
-        # 创建一个爬虫数据对象
-        item = MyscrapyItem()
-        if result is not None:
-            # json 字符串转成json对象
-            script = json.loads(result.string, strict=False)
-            content = soup.find('a', href=re.compile("^https://www.douban.com/people/"))
-            # 截取出信息创建者的豆瓣id
-            item['creator'] = str(content['href'])[30:-1]
-            item['title'] = script["name"]
-            item['createDate'] = script["dateCreated"]
-            item['text'] = script["text"]
-            item['crawDate'] = datetime.now()
-            item['url'] = script["url"]
-            item['image_urls'] = image_urls
-            yield item
+        try:
+            page = response.meta['page']
+        except:
+            page = 1
+        page = page + 1
+        # 解析当前这次请求的结果
+        json_object = json.loads(response.text)
+        if json_object['code'] == '200':
+            data = json_object['data']
+            for i in data:
+                item = MyscrapyItem()
+                item['creator'] = i['creator']
+                item['title'] = i['title']
+                item['createDate'] = i['createDate']
+                item['text'] = i['text']
+                item['crawDate'] = datetime.now()
+                item['url'] = i['url']
+                yield item
+        if page < page_num:
+            new_url = f"https://hpapi.mlscoder.cn/data?username={username}&page={page}"
+            # 回调方法，进行下一次读取
+            print(new_url)
+            yield scrapy.Request(url=new_url, callback=self.parse, meta={'page': page})

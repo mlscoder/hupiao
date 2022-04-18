@@ -50,7 +50,8 @@ DOWNLOAD_DELAY = 3
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    'myScrapy.middlewares.myProxy': 543,
+    #  学习分支下，不需要使用代理
+    #  'myScrapy.middlewares.myProxy': 543,
 }
 
 # Enable or disable extensions

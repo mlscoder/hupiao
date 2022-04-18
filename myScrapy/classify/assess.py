@@ -7,8 +7,10 @@ from sklearn.svm import SVC
 from classify.classifier import TextClassifier
 from time import *
 
-
 # 多项式朴素贝叶斯分类器
+from config import project_path
+
+
 def Multinomial(data_dir, model_dir):
     clf = MultinomialNB(alpha=1.0, fit_prior=True)
     model_path = model_dir + '/NBclassifier.pkl'
@@ -62,8 +64,8 @@ def duibi():
 
 
 def get_classifier():
-    model_dir = 'E:\\PycharmProjects\\mlscoder\\myScrapy\\classify\\models'  # 模型存放目录
-    data_dir = 'E:\\PycharmProjects\\mlscoder\\myScrapy\\classify\\feature_space'  # 特征数据存放目录
+    model_dir = f'{project_path}\\myScrapy\\classify\\models'  # 模型存放目录
+    data_dir = f'{project_path}\\myScrapy\\classify\\feature_space'  # 特征数据存放目录
     classifier = Logistic(data_dir, model_dir)
     return classifier
 

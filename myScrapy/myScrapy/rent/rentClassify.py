@@ -174,16 +174,3 @@ def tfidf_similarity(s1, s2):
     vectors = cv.fit_transform(corpus).toarray()
     # 计算TF系数
     return np.dot(vectors[0], vectors[1]) / (norm(vectors[0]) * norm(vectors[1]))
-
-
-model_dir = '../../classify/models'  # 模型存放目录
-data_dir = '../../classify/feature_space'  # 特征数据存放目录
-classifier = assess.Logistic(data_dir, model_dir)
-
-if __name__ == '__main__':
-    url = "testurl"
-    creator = "textuser"
-    text1 = "标题：🌲6号线，金桥路地铁站，精装燃气一室户3300，16分钟直达世纪大道，可转乘2/4/9号线，交通方便，小区门口紧邻金桥国际，久金广场等"
-    text2 = "👠【地铁一号线】💋【无中介费】近中庚环创中心，1号线地铁站，东苑商务楼；女生合租、主卧➕独卫➕公用厨房；押一付一，给你舒适的居住体验哟！"
-
-    analysis(url, creator, text1)

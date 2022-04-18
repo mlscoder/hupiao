@@ -16,8 +16,8 @@ dbUtil = MySqlUtil()
 class MyscrapyPipeline:
     def process_item(self, item, spider):
         result = [item["title"], item["createDate"], item["text"], item["crawDate"], item["url"], item["creator"]]
+        print(result)
         haveOne = [item["creator"]]
-        image_urls = item["image_urls"]
 
         # 查询同一个创建者最近一个月发布的帖子
         querySql = "select title from house_info where creator=(%s)  and crawDate >= DATE_SUB(NOW(),INTERVAL 30 day)"
@@ -37,11 +37,6 @@ class MyscrapyPipeline:
 
             # 保存信息分类
             print(info)
-            r_id = dbUtil.save(infoSaveSql, info)
-            # 图片链接保存
-            if len(image_urls) > 0:
-                imageSql = "INSERT INTO image(r_id,url) VALUES (%s,%s)"
-                for image_url in image_urls:
-                    i = [r_id, image_url]
-                    dbUtil.save(imageSql, i)
+            # 这里是入库，我没有写了，因为我的数据库里有了这些。
+            #  r_id = dbUtil.save(infoSaveSql, info)
         return item
