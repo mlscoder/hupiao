@@ -2,8 +2,8 @@ Flask==1.1.4
 requests==2.24.0
 scipy==1.6.0
 PyMySQL==0.10.1
-Scrapy==2.4.1
-lxml==4.6.2
+Scrapy==2.6.0
+lxml==4.6.5
 Flask_SQLAlchemy==2.4.4
 matplotlib==3.4.0
 joblib==1.0.1
